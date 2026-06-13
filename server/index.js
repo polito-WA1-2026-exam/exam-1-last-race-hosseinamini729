@@ -5,6 +5,7 @@ import passport from "passport";
 
 import { configurePassport } from "#src/config/passport.js";
 import { AuthModule } from "#src/modules/auth/auth.module.js";
+import { NetworkModule } from "#src/modules/network/network.module.js";
 
 const app = express();
 const port = 3001;
@@ -30,7 +31,9 @@ app.use(passport.authenticate("session"));
 configurePassport(passport);
 
 const authModule = new AuthModule();
-app.use("/api", authModule.router);
+const networkModule = new NetworkModule();
+
+app.use("/api", authModule.router, networkModule.router);
 
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
