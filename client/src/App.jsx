@@ -6,13 +6,9 @@ import NavigationBar from "./components/NavigationBar.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import GamePage from "./pages/GamePage.jsx";
+import RankingPage from "./pages/RankingPage.jsx";
 
 // Temporary placeholders for pages
-const RankingPage = () => (
-  <div>
-    <h2>Ranking Page (Leaderboard)</h2>
-  </div>
-);
 const NotFound = () => (
   <div>
     <h2>404 - Page Not Found</h2>
