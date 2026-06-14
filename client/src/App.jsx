@@ -4,13 +4,9 @@ import { AuthProvider } from "./contexts/AuthContext.jsx";
 import NavigationBar from "./components/NavigationBar.jsx";
 
 import LoginPage from "./pages/LoginPage.jsx";
+import HomePage from "./pages/HomePage.jsx";
 
 // Temporary placeholders for pages
-const HomePage = () => (
-  <div>
-    <h2>Home Page (Instructions & Map)</h2>
-  </div>
-);
 const GamePage = () => (
   <div>
     <h2>Game Page (Planning & Execution)</h2>
