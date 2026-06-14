@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from "react";
+import { authAPI } from "../api/auth.js";
 
 export const AuthContext = createContext();
 
@@ -8,15 +9,9 @@ export const AuthProvider = ({ children }) => {
 
   const checkSession = async () => {
     try {
-      const response = await fetch("/api/auth/current");
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
-      } else {
-        setUser(null);
-      }
+      const userData = await authAPI.getCurrentSession();
+      setUser(userData);
     } catch (error) {
-      console.error("Failed to check session", error);
       setUser(null);
     } finally {
       setLoading(false);
@@ -32,8 +27,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   const handleLogout = async () => {
-    await fetch("/api/auth/current", { method: "DELETE" });
-    setUser(null);
+    try {
+      await authAPI.logout();
+      setUser(null);
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
   };
 
   return (

@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import { Form, Button, Alert, Container, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext.jsx";
+import { authAPI } from "../api/auth.js";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -16,24 +17,14 @@ const LoginPage = () => {
     setErrorMsg("");
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (response.ok) {
-        const user = await response.json();
-        handleLogin(user);
-        navigate("/game");
-      } else {
-        const err = await response.json();
-        setErrorMsg(
-          err.message || "Login failed. Please check your credentials.",
-        );
-      }
+      const user = await authAPI.login(username, password);
+      handleLogin(user);
+      navigate("/game");
     } catch (err) {
-      setErrorMsg("Network error, please try again later.");
+      const message =
+        err.response?.data?.message ||
+        "Login failed. Please check your credentials.";
+      setErrorMsg(message);
     }
   };
 
@@ -61,7 +52,7 @@ const LoginPage = () => {
                 <Form.Label>Password</Form.Label>
                 <Form.Control
                   type="password"
-                  placeholder="Enter password (e.g., 123456)"
+                  placeholder="Enter password (e.g., password123)"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
