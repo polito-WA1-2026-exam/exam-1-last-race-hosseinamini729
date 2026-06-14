@@ -1,15 +1,14 @@
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import { Container } from "react-bootstrap";
+import { AuthProvider } from "./contexts/AuthContext.js";
+import NavigationBar from "./components/NavigationBar.jsx";
+
+import LoginPage from "./pages/LoginPage.jsx";
 
 // Temporary placeholders for pages
 const HomePage = () => (
   <div>
     <h2>Home Page (Instructions & Map)</h2>
-  </div>
-);
-const LoginPage = () => (
-  <div>
-    <h2>Login Page</h2>
   </div>
 );
 const GamePage = () => (
@@ -30,9 +29,12 @@ const NotFound = () => (
 
 const AppLayout = () => {
   return (
-    <Container className="mt-4">
-      <Outlet />
-    </Container>
+    <>
+      <NavigationBar />
+      <Container className="mt-4">
+        <Outlet />
+      </Container>
+    </>
   );
 };
 
@@ -50,7 +52,11 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+      <RouterProvider router={router} />;
+    </AuthProvider>
+  );
 }
 
 export default App;
