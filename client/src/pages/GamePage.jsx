@@ -202,6 +202,7 @@ const GamePage = () => {
                   variant="primary"
                   className="w-100"
                   onClick={submitRoute}
+                  disabled={selectedSegments.length === 0}
                 >
                   Submit Route Now
                 </Button>
