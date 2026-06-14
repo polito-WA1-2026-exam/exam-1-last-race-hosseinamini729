@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { Container, Row, Col, Card, Alert, Spinner } from "react-bootstrap";
 import { AuthContext } from "../contexts/AuthContext.jsx";
+import { networkAPI } from "../api/network.js";
 import NetworkMap from "../components/NetworkMap.jsx";
 
 const HomePage = () => {
@@ -9,7 +10,6 @@ const HomePage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Fetch the subway network data from the backend
   useEffect(() => {
     if (!user) {
       setNetworkData(null);
@@ -20,15 +20,11 @@ const HomePage = () => {
       setLoading(true);
       setError("");
       try {
-        const response = await fetch("/api/network");
-        if (response.ok) {
-          const data = await response.json();
-          setNetworkData(data);
-        } else {
-          setError("Failed to load network map.");
-        }
+        const data = await networkAPI.getNetwork();
+        setNetworkData(data);
       } catch (err) {
         setError("Network error occurred while fetching the map.");
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -103,7 +99,6 @@ const HomePage = () => {
                   {error}
                 </Alert>
               ) : (
-                /* Render the modularized NetworkMap component and pass the fetched data */
                 networkData && <NetworkMap networkData={networkData} />
               )}
             </Card.Body>
