@@ -5,13 +5,9 @@ import NavigationBar from "./components/NavigationBar.jsx";
 
 import LoginPage from "./pages/LoginPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
+import GamePage from "./pages/GamePage.jsx";
 
 // Temporary placeholders for pages
-const GamePage = () => (
-  <div>
-    <h2>Game Page (Planning & Execution)</h2>
-  </div>
-);
 const RankingPage = () => (
   <div>
     <h2>Ranking Page (Leaderboard)</h2>
