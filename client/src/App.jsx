@@ -1,6 +1,6 @@
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import { Container } from "react-bootstrap";
-import { AuthProvider } from "./contexts/AuthContext.js";
+import { AuthProvider } from "./contexts/AuthContext.jsx";
 import NavigationBar from "./components/NavigationBar.jsx";
 
 import LoginPage from "./pages/LoginPage.jsx";

@@ -16,7 +16,7 @@ const LoginPage = () => {
     setErrorMsg("");
 
     try {
-      const response = await fetch("/api/sessions", {
+      const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -61,7 +61,7 @@ const LoginPage = () => {
                 <Form.Label>Password</Form.Label>
                 <Form.Control
                   type="password"
-                  placeholder="Enter password (e.g., password123)"
+                  placeholder="Enter password (e.g., 123456)"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
