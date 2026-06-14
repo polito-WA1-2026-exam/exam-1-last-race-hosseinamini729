@@ -3,6 +3,7 @@ import { Container, Row, Col, Card, Alert, Spinner } from "react-bootstrap";
 import { AuthContext } from "../contexts/AuthContext.jsx";
 import { networkAPI } from "../api/network.js";
 import NetworkMap from "../components/NetworkMap.jsx";
+import usePageTitle from "../hooks/usePageTitle.js";
 
 const HomePage = () => {
   const { user } = useContext(AuthContext);
@@ -10,6 +11,7 @@ const HomePage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  usePageTitle("Home");
   useEffect(() => {
     if (!user) {
       setNetworkData(null);

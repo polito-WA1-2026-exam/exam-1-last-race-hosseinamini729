@@ -9,11 +9,13 @@ import {
   Alert,
 } from "react-bootstrap";
 import { gameAPI } from "../api/game.js";
+import usePageTitle from "../hooks/usePageTitle.js";
 
 const RankingPage = () => {
   const [rankings, setRankings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  usePageTitle("Leaderboard");
 
   useEffect(() => {
     const fetchRankings = async () => {

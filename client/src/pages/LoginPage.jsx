@@ -3,8 +3,10 @@ import { Form, Button, Alert, Container, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext.jsx";
 import { authAPI } from "../api/auth.js";
+import usePageTitle from "../hooks/usePageTitle.js";
 
 const LoginPage = () => {
+  usePageTitle("Login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");

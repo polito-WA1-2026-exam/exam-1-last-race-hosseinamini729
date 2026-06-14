@@ -13,8 +13,10 @@ import {
 import { AuthContext } from "../contexts/AuthContext.jsx";
 import { networkAPI } from "../api/network.js";
 import { gameAPI } from "../api/game.js";
+import usePageTitle from "../hooks/usePageTitle.js";
 
 const GamePage = () => {
+  usePageTitle("Play Game");
   const { user } = useContext(AuthContext);
 
   const [gameState, setGameState] = useState("idle");
