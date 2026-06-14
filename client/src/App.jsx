@@ -7,13 +7,7 @@ import LoginPage from "./pages/LoginPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import GamePage from "./pages/GamePage.jsx";
 import RankingPage from "./pages/RankingPage.jsx";
-
-// Temporary placeholders for pages
-const NotFound = () => (
-  <div>
-    <h2>404 - Page Not Found</h2>
-  </div>
-);
+import NotFoundPage from "./pages/NotFoundPage.jsx";
 
 const AppLayout = () => {
   return (
@@ -34,7 +28,7 @@ const router = createBrowserRouter([
       { path: "/login", element: <LoginPage /> },
       { path: "/game", element: <GamePage /> },
       { path: "/ranking", element: <RankingPage /> },
-      { path: "*", element: <NotFound /> },
+      { path: "*", element: <NotFoundPage /> },
     ],
   },
 ]);
