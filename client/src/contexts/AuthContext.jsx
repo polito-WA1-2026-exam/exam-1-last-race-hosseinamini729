@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
 
   const checkSession = async () => {
     try {
-      const response = await fetch("/api/sessions/current");
+      const response = await fetch("/api/auth/current");
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);
@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const handleLogout = async () => {
-    await fetch("/api/sessions/current", { method: "DELETE" });
+    await fetch("/api/auth/current", { method: "DELETE" });
     setUser(null);
   };
 
