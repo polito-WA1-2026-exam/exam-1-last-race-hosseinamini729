@@ -10,6 +10,20 @@ const HomePage = () => {
   const [networkData, setNetworkData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isGameActive, setIsGameActive] = useState(
+    localStorage.getItem("gameInProgress") === "true",
+  );
+
+  // Handling Anti-Cheat
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setIsGameActive(localStorage.getItem("gameInProgress") === "true");
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   usePageTitle("Home");
   useEffect(() => {
@@ -89,6 +103,13 @@ const HomePage = () => {
                   Please <strong>Login</strong> to view the interactive subway
                   network map.
                 </Alert>
+              ) : isGameActive ? (
+                <Alert variant="danger" className="m-4 text-center fs-5">
+                  <strong>⛔ Anti-Cheat Activated!</strong>
+                  <br />
+                  You currently have an active game in progress. You cannot view
+                  the map until you finish your race!
+                </Alert>
               ) : loading ? (
                 <div className="text-center py-5">
                   <Spinner animation="border" variant="primary" />
@@ -103,7 +124,7 @@ const HomePage = () => {
               ) : (
                 networkData && <NetworkMap networkData={networkData} />
               )}
-            </Card.Body>
+            </Card.Body>{" "}
           </Card>
         </Col>
       </Row>
