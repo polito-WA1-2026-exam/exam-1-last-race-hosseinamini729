@@ -55,6 +55,12 @@ const GamePage = () => {
     return () => clearInterval(timer);
   }, [gameState, timeLeft]);
 
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem("gameInProgress");
+    };
+  }, []);
+
   const handleStartGame = async () => {
     try {
       const data = await gameAPI.startGame();
@@ -64,6 +70,9 @@ const GamePage = () => {
       setTimeLeft(90);
       setResultData(null);
       setGameState("planning");
+
+      // Local storage used for Anti-Cheat
+      localStorage.setItem("gameInProgress", "true");
     } catch (err) {
       console.error("Failed to start game", err);
     }
@@ -83,6 +92,8 @@ const GamePage = () => {
     if (gameState === "result") return;
 
     setGameState("result");
+
+    localStorage.removeItem("gameInProgress");
 
     const payload = {
       startStationId: gameData.startStation.id,
@@ -202,6 +213,7 @@ const GamePage = () => {
                   variant="primary"
                   className="w-100"
                   onClick={submitRoute}
+                  disabled={selectedSegments.length === 0}
                 >
                   Submit Route Now
                 </Button>
