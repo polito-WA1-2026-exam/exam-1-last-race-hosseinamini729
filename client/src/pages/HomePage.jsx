@@ -4,6 +4,7 @@ import { AuthContext } from "../contexts/AuthContext.jsx";
 import { networkAPI } from "../api/network.js";
 import NetworkMap from "../components/NetworkMap.jsx";
 import usePageTitle from "../hooks/usePageTitle.js";
+import PageTransition from "../components/PageTransition.jsx";
 
 const HomePage = () => {
   const { user } = useContext(AuthContext);
@@ -50,85 +51,88 @@ const HomePage = () => {
   }, [user]);
 
   return (
-    <Container className="my-4">
-      {/* Game Instructions Section */}
-      <Row className="mb-4">
-        <Col>
-          <Card className="bg-light shadow-sm border-0">
-            <Card.Body>
-              <Card.Title
-                as="h1"
-                className="text-primary border-bottom pb-2 fw-bold"
-              >
-                Welcome to Last Race!
-              </Card.Title>
-              <Card.Text className="fs-5 mt-3">
-                <strong>Game Instructions:</strong>
-              </Card.Text>
-              <ol className="fs-6 text-muted">
-                <li>
-                  <strong>Setup Phase:</strong> Review the interactive network
-                  map below to memorize connections (Login required).
-                </li>
-                <li>
-                  <strong>Planning Phase:</strong> You will be given a random
-                  start and destination station. You have exactly{" "}
-                  <strong>90 seconds</strong> to build a valid continuous route.
-                </li>
-                <li>
-                  <strong>Execution Phase:</strong> Your path is validated.
-                  Random events will modify your starting coins (20). An invalid
-                  route results in a score of 0!
-                </li>
-                <li>
-                  <strong>Result Phase:</strong> Your remaining coins determine
-                  your final score on the leaderboard.
-                </li>
-              </ol>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+    <PageTransition>
+      <Container className="my-4">
+        {/* Game Instructions Section */}
+        <Row className="mb-4">
+          <Col>
+            <Card className="bg-light shadow-sm border-0">
+              <Card.Body>
+                <Card.Title
+                  as="h1"
+                  className="text-primary border-bottom pb-2 fw-bold"
+                >
+                  Welcome to Last Race!
+                </Card.Title>
+                <Card.Text className="fs-5 mt-3">
+                  <strong>Game Instructions:</strong>
+                </Card.Text>
+                <ol className="fs-6 text-muted">
+                  <li>
+                    <strong>Setup Phase:</strong> Review the interactive network
+                    map below to memorize connections (Login required).
+                  </li>
+                  <li>
+                    <strong>Planning Phase:</strong> You will be given a random
+                    start and destination station. You have exactly{" "}
+                    <strong>90 seconds</strong> to build a valid continuous
+                    route.
+                  </li>
+                  <li>
+                    <strong>Execution Phase:</strong> Your path is validated.
+                    Random events will modify your starting coins (20). An
+                    invalid route results in a score of 0!
+                  </li>
+                  <li>
+                    <strong>Result Phase:</strong> Your remaining coins
+                    determine your final score on the leaderboard.
+                  </li>
+                </ol>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
 
-      {/* Interactive Network Map Section */}
-      <Row>
-        <Col>
-          <Card className="shadow-sm border-0">
-            <Card.Header as="h4" className="bg-dark text-white py-3">
-              Interactive Subway Network Map
-            </Card.Header>
-            <Card.Body className="p-0">
-              {!user ? (
-                <Alert variant="warning" className="m-4 text-center fs-5">
-                  Please <strong>Login</strong> to view the interactive subway
-                  network map.
-                </Alert>
-              ) : isGameActive ? (
-                <Alert variant="danger" className="m-4 text-center fs-5">
-                  <strong>⛔ Anti-Cheat Activated!</strong>
-                  <br />
-                  You currently have an active game in progress. You cannot view
-                  the map until you finish your race!
-                </Alert>
-              ) : loading ? (
-                <div className="text-center py-5">
-                  <Spinner animation="border" variant="primary" />
-                  <p className="mt-3 text-muted fs-5">
-                    Generating visual map...
-                  </p>
-                </div>
-              ) : error ? (
-                <Alert variant="danger" className="m-4">
-                  {error}
-                </Alert>
-              ) : (
-                networkData && <NetworkMap networkData={networkData} />
-              )}
-            </Card.Body>{" "}
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+        {/* Interactive Network Map Section */}
+        <Row>
+          <Col>
+            <Card className="shadow-sm border-0">
+              <Card.Header as="h4" className="bg-dark text-white py-3">
+                Interactive Subway Network Map
+              </Card.Header>
+              <Card.Body className="p-0">
+                {!user ? (
+                  <Alert variant="warning" className="m-4 text-center fs-5">
+                    Please <strong>Login</strong> to view the interactive subway
+                    network map.
+                  </Alert>
+                ) : isGameActive ? (
+                  <Alert variant="danger" className="m-4 text-center fs-5">
+                    <strong>⛔ Anti-Cheat Activated!</strong>
+                    <br />
+                    You currently have an active game in progress. You cannot
+                    view the map until you finish your race!
+                  </Alert>
+                ) : loading ? (
+                  <div className="text-center py-5">
+                    <Spinner animation="border" variant="primary" />
+                    <p className="mt-3 text-muted fs-5">
+                      Generating visual map...
+                    </p>
+                  </div>
+                ) : error ? (
+                  <Alert variant="danger" className="m-4">
+                    {error}
+                  </Alert>
+                ) : (
+                  networkData && <NetworkMap networkData={networkData} />
+                )}
+              </Card.Body>{" "}
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+    </PageTransition>
   );
 };
 

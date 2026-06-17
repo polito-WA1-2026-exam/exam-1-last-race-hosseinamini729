@@ -14,8 +14,7 @@
 
 - POST `/api/auth/login`
   - Purpose: Authenticate user and create a session.
-  - Request body content:
-    `{ "username": "player1", "password": "123456" }`
+  - Request body content: `{ "username": "player1", "password": "123456" }`
   - Response body content: User object `{ "id": 1, "username": "player1" }` or error message (401).
 - GET `/api/auth/current`
   - Purpose: Check if the current user is authenticated.
@@ -44,7 +43,7 @@
 
 ## Database Tables
 
-- Table `users` - contains `id` (Primary Key), `username` (Unique), `salt`, and `hashed_password`.
+- Table `users` - contains `id` (Primary Key), `username` (Unique), and `hashed_password`.
 - Table `stations` - contains `id` (Primary Key), and `name`.
 - Table `lines` - contains `id` (Primary Key), `name`, and `color`.
 - Table `segments` - contains `id` (Primary Key), `station_a_id` (Foreign Key), `station_b_id` (Foreign Key), and `line_id` (Foreign Key).
@@ -56,11 +55,15 @@
 - `AuthContext` (in `contexts/AuthContext.jsx`): Manages the global authentication state, session checking, login, and logout logic using the Axios API client.
 - `NavigationBar` (in `components/NavigationBar.jsx`): Responsive header component that adapts its navigation links based on the user's authentication status.
 - `NetworkMap` (in `components/NetworkMap.jsx`): A modular component utilizing `vis-network` to render an interactive, physics-based graph of the subway system during the Setup phase.
+- `PageTransition` (in `components/PageTransition.jsx`): A wrapper component utilizing `framer-motion` to provide smooth fade-in animations and transitions across page navigations, enhancing the overall UX.
 - `PageTitle Hook` (in `hooks/usePageTitle.js`): A custom React Hook responsible for dynamically updating the browser's document title for better UX without relying on outdated external packages.
 
 ## Screenshot
 
-![Screenshot](./img/screenshot.jpg)
+![Game](./img/game.png)
+![Home](./img/home.png)
+![Leaderboard](./img/leaderboard.png)
+![Login](./img/login.png)
 
 ## Users Credentials
 
@@ -70,4 +73,4 @@
 
 ## Use of AI Tools
 
-I used Google Gemini to assist with conceptualizing the backend architecture (Controller-Service-Module pattern), debugging React Router v7 configurations, generating the interactive vis-network map implementation, and refactoring standard fetch API calls into a centralized Axios service. I verified all outputs by thoroughly testing the application logic, ensuring strict adherence to the project requirements, and actively adapting the code to fit the application's specific flow and constraints.
+I used Google Gemini to assist with conceptualizing the backend architecture (Controller-Service-Module pattern), debugging React Router v7 configurations, generating the interactive vis-network map implementation, refactoring standard fetch API calls into a centralized Axios service, and implementing smooth UI transitions. I verified all outputs by thoroughly testing the application logic, ensuring strict adherence to the project requirements, and actively adapting the code to fit the application's specific flow and constraints.
