@@ -11,34 +11,30 @@ import {
   ProgressBar,
 } from "react-bootstrap";
 import { AuthContext } from "../contexts/AuthContext.jsx";
+import { networkAPI } from "../api/network.js";
+import { gameAPI } from "../api/game.js";
+import usePageTitle from "../hooks/usePageTitle.js";
 
 const GamePage = () => {
+  usePageTitle("Play Game");
   const { user } = useContext(AuthContext);
 
-  // State to manage the current phase of the game: 'idle', 'planning', or 'result'
   const [gameState, setGameState] = useState("idle");
-
-  // Data states
-  const [stationMap, setStationMap] = useState({}); // Maps station ID to station Name
-  const [gameData, setGameData] = useState(null); // Holds start/end stations and shuffled segments
-  const [selectedSegments, setSelectedSegments] = useState([]); // User's built route
-  const [availableSegments, setAvailableSegments] = useState([]); // Remaining segments to choose from
-  const [resultData, setResultData] = useState(null); // Backend validation result
-
-  // Timer state for the Planning Phase
+  const [stationMap, setStationMap] = useState({});
+  const [gameData, setGameData] = useState(null);
+  const [selectedSegments, setSelectedSegments] = useState([]);
+  const [availableSegments, setAvailableSegments] = useState([]);
+  const [resultData, setResultData] = useState(null);
   const [timeLeft, setTimeLeft] = useState(90);
 
-  // Fetch network data once to map station IDs to their names for displaying segments
+  // Fetch network data to map station IDs to names
   useEffect(() => {
     const fetchNetwork = async () => {
       try {
-        const res = await fetch("/api/network");
-        if (res.ok) {
-          const data = await res.json();
-          const map = {};
-          data.stations.forEach((s) => (map[s.id] = s.name));
-          setStationMap(map);
-        }
+        const data = await networkAPI.getNetwork();
+        const map = {};
+        data.stations.forEach((s) => (map[s.id] = s.name));
+        setStationMap(map);
       } catch (err) {
         console.error("Failed to load station dictionary", err);
       }
@@ -46,7 +42,7 @@ const GamePage = () => {
     if (user) fetchNetwork();
   }, [user]);
 
-  // Timer Logic: Counts down from 90 during the 'planning' phase
+  // Timer Logic
   useEffect(() => {
     let timer;
     if (gameState === "planning" && timeLeft > 0) {
@@ -54,62 +50,59 @@ const GamePage = () => {
         setTimeLeft((prevTime) => prevTime - 1);
       }, 1000);
     } else if (gameState === "planning" && timeLeft === 0) {
-      // Automatically submit the route if time runs out
       submitRoute();
     }
     return () => clearInterval(timer);
   }, [gameState, timeLeft]);
 
-  // Triggers the backend to generate a new game setup
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem("gameInProgress");
+    };
+  }, []);
+
   const handleStartGame = async () => {
     try {
-      const res = await fetch("/api/game/start");
-      if (res.ok) {
-        const data = await res.json();
-        setGameData(data);
-        setAvailableSegments(data.segments);
-        setSelectedSegments([]);
-        setTimeLeft(90);
-        setResultData(null);
-        setGameState("planning");
-      }
+      const data = await gameAPI.startGame();
+      setGameData(data);
+      setAvailableSegments(data.segments);
+      setSelectedSegments([]);
+      setTimeLeft(90);
+      setResultData(null);
+      setGameState("planning");
+
+      // Local storage used for Anti-Cheat
+      localStorage.setItem("gameInProgress", "true");
     } catch (err) {
       console.error("Failed to start game", err);
     }
   };
 
-  // Moves a segment from Available to Selected
   const selectSegment = (segment) => {
     setAvailableSegments((prev) => prev.filter((s) => s.id !== segment.id));
     setSelectedSegments((prev) => [...prev, segment]);
   };
 
-  // Moves a segment from Selected back to Available
   const removeSegment = (segment) => {
     setSelectedSegments((prev) => prev.filter((s) => s.id !== segment.id));
     setAvailableSegments((prev) => [...prev, segment]);
   };
 
-  // Submits the selected route to the backend for the Execution Phase
   const submitRoute = async () => {
-    // Prevent multiple submissions
     if (gameState === "result") return;
 
     setGameState("result");
 
+    localStorage.removeItem("gameInProgress");
+
     const payload = {
       startStationId: gameData.startStation.id,
       endStationId: gameData.endStation.id,
-      segments: selectedSegments.map((s) => s.id), // Send only the IDs in order
+      segments: selectedSegments.map((s) => s.id),
     };
 
     try {
-      const res = await fetch("/api/game/play", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
+      const data = await gameAPI.playGame(payload);
       setResultData(data);
     } catch (err) {
       console.error("Failed to submit game", err);
@@ -129,6 +122,7 @@ const GamePage = () => {
     );
   }
 
+  // The return statement (UI) remains completely unchanged!
   return (
     <Container className="my-4">
       {/* ---------------- IDLE PHASE ---------------- */}
@@ -219,6 +213,7 @@ const GamePage = () => {
                   variant="primary"
                   className="w-100"
                   onClick={submitRoute}
+                  disabled={selectedSegments.length === 0}
                 >
                   Submit Route Now
                 </Button>

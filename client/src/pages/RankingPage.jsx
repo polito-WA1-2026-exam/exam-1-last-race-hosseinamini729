@@ -8,34 +8,27 @@ import {
   Spinner,
   Alert,
 } from "react-bootstrap";
+import { gameAPI } from "../api/game.js";
+import usePageTitle from "../hooks/usePageTitle.js";
 
 const RankingPage = () => {
   const [rankings, setRankings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  usePageTitle("Leaderboard");
 
-  // Fetch the leaderboard data when the component mounts
   useEffect(() => {
     const fetchRankings = async () => {
       try {
-        const response = await fetch("/api/game/ranking");
-
-        // Handle unauthorized access if the backend protects this route
-        if (response.status === 401) {
-          setError("Please login to view the leaderboard.");
-          setLoading(false);
-          return;
-        }
-
-        if (response.ok) {
-          const data = await response.json();
-          setRankings(data);
-        } else {
-          setError("Failed to fetch ranking data.");
-        }
+        const data = await gameAPI.getRanking();
+        setRankings(data);
       } catch (err) {
         console.error("Ranking fetch error:", err);
-        setError("Network error occurred while fetching rankings.");
+        if (err.response?.status === 401) {
+          setError("Please login to view the leaderboard.");
+        } else {
+          setError("Network error occurred while fetching rankings.");
+        }
       } finally {
         setLoading(false);
       }

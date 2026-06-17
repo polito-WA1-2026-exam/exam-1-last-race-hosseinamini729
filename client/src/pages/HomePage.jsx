@@ -1,23 +1,31 @@
 import { useContext, useEffect, useState } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  ListGroup,
-  Badge,
-  Alert,
-  Spinner,
-} from "react-bootstrap";
+import { Container, Row, Col, Card, Alert, Spinner } from "react-bootstrap";
 import { AuthContext } from "../contexts/AuthContext.jsx";
+import { networkAPI } from "../api/network.js";
+import NetworkMap from "../components/NetworkMap.jsx";
+import usePageTitle from "../hooks/usePageTitle.js";
 
 const HomePage = () => {
   const { user } = useContext(AuthContext);
   const [networkData, setNetworkData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isGameActive, setIsGameActive] = useState(
+    localStorage.getItem("gameInProgress") === "true",
+  );
 
-  // Fetch the subway network data if the user is authenticated
+  // Handling Anti-Cheat
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setIsGameActive(localStorage.getItem("gameInProgress") === "true");
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  usePageTitle("Home");
   useEffect(() => {
     if (!user) {
       setNetworkData(null);
@@ -28,15 +36,11 @@ const HomePage = () => {
       setLoading(true);
       setError("");
       try {
-        const response = await fetch("/api/network");
-        if (response.ok) {
-          const data = await response.json();
-          setNetworkData(data);
-        } else {
-          setError("Failed to load network map.");
-        }
+        const data = await networkAPI.getNetwork();
+        setNetworkData(data);
       } catch (err) {
         setError("Network error occurred while fetching the map.");
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -47,11 +51,15 @@ const HomePage = () => {
 
   return (
     <Container className="my-4">
+      {/* Game Instructions Section */}
       <Row className="mb-4">
         <Col>
-          <Card className="bg-light shadow-sm">
+          <Card className="bg-light shadow-sm border-0">
             <Card.Body>
-              <Card.Title as="h1" className="text-primary border-bottom pb-2">
+              <Card.Title
+                as="h1"
+                className="text-primary border-bottom pb-2 fw-bold"
+              >
                 Welcome to Last Race!
               </Card.Title>
               <Card.Text className="fs-5 mt-3">
@@ -59,25 +67,22 @@ const HomePage = () => {
               </Card.Text>
               <ol className="fs-6 text-muted">
                 <li>
-                  <strong>Setup Phase:</strong> Review the complete network map
-                  below to memorize connections (Only available for logged-in
-                  players).
+                  <strong>Setup Phase:</strong> Review the interactive network
+                  map below to memorize connections (Login required).
                 </li>
                 <li>
-                  <strong>Planning Phase:</strong> Once you start, lines
-                  disappear! You are given a random start and destination
-                  station. You have exactly <strong>90 seconds</strong> to
-                  select and chain connected segments to build a valid route.
+                  <strong>Planning Phase:</strong> You will be given a random
+                  start and destination station. You have exactly{" "}
+                  <strong>90 seconds</strong> to build a valid continuous route.
                 </li>
                 <li>
-                  <strong>Execution Phase:</strong> The system validates your
-                  path. If correct, you travel step-by-step. Random events will
-                  occur, modifying your initial 20 coins. If the route is broken
-                  or incorrect, your score instantly becomes 0!
+                  <strong>Execution Phase:</strong> Your path is validated.
+                  Random events will modify your starting coins (20). An invalid
+                  route results in a score of 0!
                 </li>
                 <li>
-                  <strong>Result Phase:</strong> Your remaining coins are
-                  recorded as your final score. Aim for the leaderboard!
+                  <strong>Result Phase:</strong> Your remaining coins determine
+                  your final score on the leaderboard.
                 </li>
               </ol>
             </Card.Body>
@@ -85,89 +90,41 @@ const HomePage = () => {
         </Col>
       </Row>
 
-      {/* Display Network Map section only for logged-in users */}
+      {/* Interactive Network Map Section */}
       <Row>
         <Col>
-          <Card className="shadow-sm">
-            <Card.Header as="h4" className="bg-dark text-white">
-              Subway Network Map
+          <Card className="shadow-sm border-0">
+            <Card.Header as="h4" className="bg-dark text-white py-3">
+              Interactive Subway Network Map
             </Card.Header>
-            <Card.Body>
+            <Card.Body className="p-0">
               {!user ? (
-                <Alert variant="warning" className="text-center mb-0">
+                <Alert variant="warning" className="m-4 text-center fs-5">
                   Please <strong>Login</strong> to view the interactive subway
-                  network map and start playing.
+                  network map.
+                </Alert>
+              ) : isGameActive ? (
+                <Alert variant="danger" className="m-4 text-center fs-5">
+                  <strong>⛔ Anti-Cheat Activated!</strong>
+                  <br />
+                  You currently have an active game in progress. You cannot view
+                  the map until you finish your race!
                 </Alert>
               ) : loading ? (
-                <div className="text-center py-4">
+                <div className="text-center py-5">
                   <Spinner animation="border" variant="primary" />
-                  <p className="mt-2 text-muted">
-                    Loading network configuration...
+                  <p className="mt-3 text-muted fs-5">
+                    Generating visual map...
                   </p>
                 </div>
               ) : error ? (
-                <Alert variant="danger">{error}</Alert>
-              ) : networkData ? (
-                <Row xs={1} md={2} lg={4} className="g-4">
-                  {networkData.lines.map((line) => {
-                    // Filter segments belonging to the current line
-                    const lineSegments = networkData.segments.filter(
-                      (s) => s.line_id === line.id,
-                    );
-
-                    // Find all unique station IDs present on this line
-                    const stationIdsOnLine = new Set();
-                    lineSegments.forEach((s) => {
-                      stationIdsOnLine.add(s.station_a_id);
-                      stationIdsOnLine.add(s.station_b_id);
-                    });
-
-                    return (
-                      <Col key={line.id}>
-                        <Card className="h-100 border-secondary">
-                          <Card.Header className="fw-bold bg-secondary text-white d-flex justify-content-between align-items-center">
-                            {line.name}
-                            <Badge bg="light" text="dark">
-                              {stationIdsOnLine.size} Stations
-                            </Badge>
-                          </Card.Header>
-                          <ListGroup variant="flush">
-                            {networkData.stations
-                              .filter((s) => stationIdsOnLine.has(s.id))
-                              .map((station) => {
-                                // Check if this station serves multiple lines (Interchange)
-                                const isInterchange =
-                                  networkData.segments
-                                    .filter(
-                                      (seg) =>
-                                        seg.station_a_id === station.id ||
-                                        seg.station_b_id === station.id,
-                                    )
-                                    .reduce(
-                                      (acc, seg) => acc.add(seg.line_id),
-                                      new Set(),
-                                    ).size > 1;
-
-                                return (
-                                  <ListGroup.Item
-                                    key={station.id}
-                                    className="d-flex justify-content-between align-items-center"
-                                  >
-                                    {station.name}
-                                    {isInterchange && (
-                                      <Badge bg="info">Interchange</Badge>
-                                    )}
-                                  </ListGroup.Item>
-                                );
-                              })}
-                          </ListGroup>
-                        </Card>
-                      </Col>
-                    );
-                  })}
-                </Row>
-              ) : null}
-            </Card.Body>
+                <Alert variant="danger" className="m-4">
+                  {error}
+                </Alert>
+              ) : (
+                networkData && <NetworkMap networkData={networkData} />
+              )}
+            </Card.Body>{" "}
           </Card>
         </Col>
       </Row>
