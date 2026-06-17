@@ -10,6 +10,7 @@ import {
 } from "react-bootstrap";
 import { gameAPI } from "../api/game.js";
 import usePageTitle from "../hooks/usePageTitle.js";
+import PageTransition from "../components/PageTransition.jsx";
 
 const RankingPage = () => {
   const [rankings, setRankings] = useState([]);
@@ -38,57 +39,59 @@ const RankingPage = () => {
   }, []);
 
   return (
-    <Container className="my-5">
-      <Row className="justify-content-center">
-        <Col md={8}>
-          <Card className="shadow-sm border-0">
-            <Card.Header className="bg-warning text-dark text-center py-3">
-              <h2 className="mb-0 fw-bold">🏆 Leaderboard</h2>
-            </Card.Header>
-            <Card.Body className="p-0">
-              {loading ? (
-                <div className="text-center py-5">
-                  <Spinner animation="border" variant="warning" />
-                  <p className="mt-2 text-muted">Loading best scores...</p>
-                </div>
-              ) : error ? (
-                <Alert variant="danger" className="m-3 text-center">
-                  {error}
-                </Alert>
-              ) : rankings.length === 0 ? (
-                <div className="text-center py-5 text-muted">
-                  <h5>No games played yet.</h5>
-                  <p>Be the first to set a high score!</p>
-                </div>
-              ) : (
-                <Table striped hover responsive className="mb-0 text-center">
-                  <thead className="table-light">
-                    <tr>
-                      <th>Rank</th>
-                      <th>Player Username</th>
-                      <th>Best Score (Coins)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rankings.map((entry, index) => (
-                      <tr key={index}>
-                        <td className="fw-bold text-muted">#{index + 1}</td>
-                        <td className="fw-bold">{entry.username}</td>
-                        <td>
-                          <span className="badge bg-success rounded-pill fs-6">
-                            {entry.bestScore}
-                          </span>
-                        </td>
+    <PageTransition>
+      <Container className="my-5">
+        <Row className="justify-content-center">
+          <Col md={8}>
+            <Card className="shadow-sm border-0">
+              <Card.Header className="bg-warning text-dark text-center py-3">
+                <h2 className="mb-0 fw-bold">🏆 Leaderboard</h2>
+              </Card.Header>
+              <Card.Body className="p-0">
+                {loading ? (
+                  <div className="text-center py-5">
+                    <Spinner animation="border" variant="warning" />
+                    <p className="mt-2 text-muted">Loading best scores...</p>
+                  </div>
+                ) : error ? (
+                  <Alert variant="danger" className="m-3 text-center">
+                    {error}
+                  </Alert>
+                ) : rankings.length === 0 ? (
+                  <div className="text-center py-5 text-muted">
+                    <h5>No games played yet.</h5>
+                    <p>Be the first to set a high score!</p>
+                  </div>
+                ) : (
+                  <Table striped hover responsive className="mb-0 text-center">
+                    <thead className="table-light">
+                      <tr>
+                        <th>Rank</th>
+                        <th>Player Username</th>
+                        <th>Best Score (Coins)</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              )}
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+                    </thead>
+                    <tbody>
+                      {rankings.map((entry, index) => (
+                        <tr key={index}>
+                          <td className="fw-bold text-muted">#{index + 1}</td>
+                          <td className="fw-bold">{entry.username}</td>
+                          <td>
+                            <span className="badge bg-success rounded-pill fs-6">
+                              {entry.bestScore}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                )}
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+    </PageTransition>
   );
 };
 
